@@ -1,10 +1,9 @@
 package Network.SocketProgramming;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Scanner;
 
 public class Server {
     ServerSocket server;
@@ -15,22 +14,62 @@ public class Server {
         try {
             server = new ServerSocket(10002);       //이 한 줄이 생성과 바인드 과정.
             client = server.accept();                    //이 과정이 어셉트
-            // 어셉트 이후에는 소켓이 접속이 완료 되었다고 생각해도 됨.
-            System.out.println("Client Socket Connected");
-
-            dataInputStream = new DataInputStream(client.getInputStream()); //클라이언트로부터 inputstream을 받아옴.
-            dataOutputStream = new DataOutputStream(client.getOutputStream());  // 클라이언트로부터 outputstream을 받아옴.
-            // 이 두개의 stream을 통해서 client와 소통하게됨.
-            String FromClient = dataInputStream.readUTF();
-            System.out.println(FromClient);
-            // client로부터 읽어온 문장
-            dataOutputStream.writeUTF("Thank you for sending messages");
-            // client에게 보내는 문장
+            System.out.println("Welcome, client");
         } catch (IOException e) {
         }
     }
+
+    public void StreamSetting() {
+        try {
+            dataInputStream = new DataInputStream(client.getInputStream());
+            dataOutputStream = new DataOutputStream(client.getOutputStream());
+        }catch(IOException e){
+        }
+    }
+
+    public void Datarecv() {
+        new Thread(new Runnable() {
+            boolean keep = true;
+            String datainput;
+            @Override
+            public void run() {
+                try {
+                    while(keep){
+                        datainput = dataInputStream.readUTF();
+                        if(datainput.equals("/exit"))
+                            keep = false;
+                        else
+                            System.out.println(datainput);
+                    }
+                }catch (Exception e){
+                }
+            }
+        }).start();
+    }
+
+    public void dataSend() {
+        new Thread(new Runnable() {
+            Scanner sc = new Scanner(System.in);
+            boolean keep = true;
+            String dataOutput;
+            @Override
+            public void run() {
+                try {
+                    while(keep){
+                        dataOutput = sc.nextLine();
+                        if(dataOutput.equals("/exit"))
+                            keep = false;
+                        else
+                            dataOutputStream.writeUTF(dataOutput);
+                    }
+                }catch(Exception e){
+                }
+            }
+        }).start();
+    }
+
     // 서버를 모두 사용했으면 닫아줘야 한다. 닫는 기능을 하는 함수
-    public void CloseAll() {
+   /*public void CloseAll() {
         try {
             server.close();
             client.close();
@@ -38,15 +77,18 @@ public class Server {
             dataOutputStream.close();
         } catch (IOException e){
         }
-    }
+    }*/
 
     public Server() {
         Setting();
-        CloseAll();
+        StreamSetting();
+        Datarecv();
+        dataSend();
+        //CloseAll();
     }
 
     public static void main(String[] args) {
-        Server MyFirstServer = new Server();
+        new Server();
     }
 }
 

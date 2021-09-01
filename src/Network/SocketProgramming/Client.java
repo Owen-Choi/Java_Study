@@ -1,9 +1,8 @@
 package Network.SocketProgramming;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
+import java.util.Scanner;
 
 public class Client {
     Socket socket;
@@ -11,25 +10,53 @@ public class Client {
     DataOutputStream dataOutputStream;
     public void Connect() {
         try {
-            socket = new Socket("192.168.8.8", 10002);
+            // ip값이 바뀌면 연결이 안되니 주의할 것
+            socket = new Socket("192.168.219.102", 10002);
             System.out.println("Client : Connect complete");
         } catch(IOException e) {
         }
     }
 
-    public String Datarecv() {
-        try {
-            return dataInputStream.readUTF();
-        }catch (IOException e){
-        }
-        return null;
+    public void Datarecv() {
+            new Thread(new Runnable() {
+                String Datainput;
+                boolean keep = true;
+                @Override
+                public void run() {
+                    while(keep){
+                        try{
+                            Datainput = dataInputStream.readUTF();
+                            if(Datainput.equals("/exit"))
+                                keep = false;
+                            else
+                                System.out.println(Datainput);
+                        }catch(Exception e){
+                        }
+                    }
+                }
+            }).start();
     }
 
-    public void dataSend(String data) {
-        try {
-            dataOutputStream.writeUTF(data);
-        }catch (IOException e){
-        }
+    public void dataSend() {
+        new Thread(new Runnable() {
+            //BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            Scanner sc = new Scanner(System.in);
+            String Dataoutput;
+            boolean keep = true;
+            @Override
+            public void run() {
+                try{
+                    while(keep){
+                        Dataoutput = sc.nextLine();
+                        if(Dataoutput.equals("/exit"))
+                            keep = false;
+                        else
+                            dataOutputStream.writeUTF(Dataoutput);
+                    }
+                }catch(Exception e){
+                }
+            }
+        }).start();
     }
 
     public void StreamSetting() {
@@ -43,13 +70,13 @@ public class Client {
     public Client() {
         Connect();  //접속을 먼저 함.
         StreamSetting();    //그 후 스트림 세팅.
-        dataSend("I'm Comming!");
-        System.out.println(Datarecv());
+        dataSend();
+        Datarecv();
         // 이 코드에서는 클라이언트 소켓의 close까지 server에서 수행하므로 Close함수는 따로 선언하지 않겠음
     }
 
     public static void main(String[] args) {
-        Client MyFirstClient = new Client();
+        new Client();
     }
 }
 
