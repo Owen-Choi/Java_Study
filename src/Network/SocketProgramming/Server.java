@@ -1,4 +1,4 @@
-package Network.SocketProgramming;
+/*package Network.SocketProgramming;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -67,7 +67,7 @@ public class Server {
             }
         }).start();
     }
-
+    */
     // 서버를 모두 사용했으면 닫아줘야 한다. 닫는 기능을 하는 함수
    /*public void CloseAll() {
         try {
@@ -77,8 +77,9 @@ public class Server {
             dataOutputStream.close();
         } catch (IOException e){
         }
-    }*/
-
+    }
+    */
+    /*
     public Server() {
         Setting();
         StreamSetting();
@@ -91,4 +92,4 @@ public class Server {
         new Server();
     }
 }
-
+*/

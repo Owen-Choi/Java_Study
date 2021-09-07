@@ -1,4 +1,4 @@
-package Network.SocketProgramming;
+/*package Network.SocketProgramming;
 
 import java.io.*;
 import java.net.Socket;
@@ -80,3 +80,4 @@ public class Client {
     }
 }
 
+*/

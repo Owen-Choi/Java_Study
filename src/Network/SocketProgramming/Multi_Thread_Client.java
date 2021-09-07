@@ -1,4 +1,4 @@
-package Network.SocketProgramming;
+/*package Network.SocketProgramming;
 
 import java.net.Socket;
 
@@ -11,3 +11,4 @@ public class Multi_Thread_Client {
         }
     }
 }
+*/
