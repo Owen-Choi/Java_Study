@@ -1,9 +1,7 @@
-/*package Network.SocketProgramming;
+/*
+package Network.SocketProgramming;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -19,12 +17,14 @@ public class Network_Class_Server {
         while(true) {
             Socket connectionSocket = welcomeSocket.accept();       //bind ::
             BufferedReader inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
-            DataOutputStream outToClient = new DataOutputStream(connectionSocket.getOutputStream());
+            BufferedWriter outToClient = new BufferedWriter(new OutputStreamWriter(connectionSocket.getOutputStream()));
             clientSentence = inFromClient.readLine();
             System.out.println("From Client, The Current Date is : " + clientSentence);
-            outToClient.writeBytes("Thanks!");
+            String temp = "Thanks!";
+            outToClient.write(temp);
         }
 
     }
 }
 */
+

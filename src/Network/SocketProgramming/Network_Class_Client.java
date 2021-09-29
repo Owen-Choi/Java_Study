@@ -1,9 +1,7 @@
-/*package Network.SocketProgramming;
+/*
+package Network.SocketProgramming;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.Socket;
 import java.util.Date;
 
@@ -15,11 +13,12 @@ public class Network_Class_Client {
         int nport = 6789;
 
         Socket clientSocket = new Socket(serverIP,nport);
-        DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
         BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        BufferedWriter outToServer = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
         sentence = new Date().toString();
-        outToServer.writeBytes(sentence + '\n');
+        outToServer.write(sentence + '\n');
         MS = inFromServer.readLine();
         System.out.println("From Server : " + MS);
     }
-}*/
+}
+*/
