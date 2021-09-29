@@ -1,4 +1,4 @@
-package Network.SocketProgramming;
+/*package Network.SocketProgramming;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -22,4 +22,4 @@ public class Network_Class_Client {
         MS = inFromServer.readLine();
         System.out.println("From Server : " + MS);
     }
-}
+}*/
