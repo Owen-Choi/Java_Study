@@ -32,9 +32,9 @@ public class NET_term_Client {
             }
             public boolean ChangeMode() throws IOException{
                 System.out.println("please choose the mode number : ");
-                System.out.println("1. chatting" +
-                        "2. invite" +
-                        "3. show information");
+                System.out.println("1. chatting \n" +
+                        "2. invite \n" +
+                        "3. show information ");
                 int tempnumber = Integer.parseInt(br.readLine());
                 switch (tempnumber) {
                     case 1 :
@@ -55,22 +55,36 @@ public class NET_term_Client {
         });
         // reader thread
         Thread reader = new Thread(new Runnable() {
+            String msgToRead;
             @Override
             public void run() {
                 try {
                     while(true) {
-                        String msgToRead = dis.readUTF();
+                        msgToRead = dis.readUTF();
                         //showInfo 명령어에서 오류 발생.
-                        st = new StringTokenizer(msgToRead, "##");
-                        if(st.countTokens() == 1) {
+                        /*if(st.countTokens() == 1) {
                             System.out.println(st.nextToken());
                         }
                         else
-                            System.out.println(st.nextToken() + " : " + st.nextToken());
+                            System.out.println(st.nextToken() + " : " + st.nextToken());*/
                     }
+
                 }catch(IOException e) {
                     e.printStackTrace();
                 }
+            }
+            public void MSG_Processor() throws IOException{
+                st = new StringTokenizer(msgToRead, "##");
+                String Header = st.nextToken();
+                if(Header.equals(TAG.INVITE_REPLY)) {
+                    // 헤더가 INVITE_REPLY라는 것은 사용자가 초대할 다른 사용자의 정보를 넘겨주어야 한다는 뜻이다.
+                    // 예외적으로 이때만 reader thread에서 입력을 주도록 하겠다.
+                    System.out.println(st.nextToken());
+                    dos.writeUTF(TAG.INVITE_REPLY.name() + br.readLine());
+                }
+                // Header가 위 조건문에 속하지 않는다는 것은 다른 user가 보낸 채팅이라는 뜻이다.
+                else
+                    System.out.println(Header + " : " + st.nextToken());
             }
         });
         System.out.println("Read/Write thread start");

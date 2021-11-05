@@ -52,7 +52,7 @@ class Client_Handler implements Runnable {
             while (true) {
                 msg = dis.readUTF();
                 //customed protocol
-                MSG_Processor(st.nextToken());
+                MSG_Processor(msg);
                 /*if (!MSGCheck(msg)) {
                     System.out.println(this.userID + " : " + msg);
                     // 일단은 입력받은 메세지 모두에게 전달, 여기서 귓속말, 혹은 게임초대 등의 기능을 넣고싶으면 프로토콜을 정의해야한다.
@@ -76,12 +76,24 @@ class Client_Handler implements Runnable {
         st = new StringTokenizer(msg, "##");
         String tempHeader = st.nextToken();
         if(tempHeader.equals(TAG.CHAT.name())) {
-
+            msg = userID + "##" + st.nextToken();
+            System.out.println(msg);
+            for(Client_Handler User : NET_term_Server.user_list) {
+                User.dos.writeUTF(msg);
+            }
+            return true;
         }
         else if(tempHeader.equals(TAG.INVITE.name())) {
-
+            //이 경우엔 HEADER를 INVITE_REPLY로 설정하고 다시 Client에게 보낸 뒤 유저의 정보를 받아온다.
+            System.out.println(msg);
+            //이 문장이 전달되지 않는다.
+            this.dos.writeUTF(TAG.INVITE_REPLY.name() + "##" + "초대하실 유저의 이름을 입력해주세요");
+            return true;
         }
         else if(tempHeader.equals(TAG.SHOW_INFO.name())) {
+            return false;
+        }
+        else if(tempHeader.equals(TAG.INVITE_REPLY.name())) {
 
         }
         return false;
