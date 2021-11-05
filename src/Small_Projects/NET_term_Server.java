@@ -10,7 +10,9 @@ public class NET_term_Server {
     static Vector<Client_Handler> user_list = new Vector<>();
     public static void main(String[] args) throws Exception{
         ServerSocket serverSocket = new ServerSocket(port);
-
+        Accept accept_thread = new Accept(serverSocket);
+        Thread at = new Thread(accept_thread);
+        at.start();
     }
 
     class Client_Handler implements Runnable{
@@ -46,22 +48,12 @@ public class NET_term_Server {
             }
         }
     }
-
-    class Accept_thread implements Runnable{
-        ServerSocket serverSocket;
-        Socket client;
-        public Accept_thread(ServerSocket serverSocket) {
-            this.serverSocket = serverSocket;
-        }
-        @Override
-        public void run() {
-            while(true) {
-                try {
-                    client = serverSocket.accept();
-                }catch(Exception e){
-                    e.printStackTrace();
-                }
-            }
-        }
+    public void Create_Handler(Socket user, DataInputStream dis, DataOutputStream dos, String userID, boolean canPlay) throws IOException {
+        Client_Handler client_handler = new Client_Handler(user, dis, dos, userID, true);
+        user_list.add(client_handler);
+        System.out.println("new user : " + client_handler.userID);
+        Thread t = new Thread(client_handler);
+        t.start();
     }
+
 }
