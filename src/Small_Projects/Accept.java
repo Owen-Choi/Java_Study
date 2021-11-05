@@ -22,7 +22,8 @@ class Accept implements Runnable{
                 client = serverSocket.accept();
                 dis = new DataInputStream(client.getInputStream());
                 dos = new DataOutputStream(client.getOutputStream());
-                name = client.toString();
+                // 지금은 선착순으로 숫자를 부여했지만 후에는 데이터베이스에서 정보 가져와서 넣어주기.
+                name = "user " + ++NET_term_Server.user_num;
                 nts.Create_Handler(client, dis, dos, name, true);
             }catch(Exception e){
                 e.printStackTrace();
