@@ -44,7 +44,6 @@ class Client_Handler implements Runnable {
         this.userID = userID;
         this.CanPlay = CanPlay;
     }
-
     @Override
     public void run() {
         String msg;
@@ -72,30 +71,57 @@ class Client_Handler implements Runnable {
         }
     }
 
-    public boolean MSG_Processor(String msg) throws IOException {
+    public void MSG_Processor(String msg) throws IOException {
         st = new StringTokenizer(msg, "##");
         String tempHeader = st.nextToken();
+        String store = null;
         if(tempHeader.equals(TAG.CHAT.name())) {
             msg = userID + "##" + st.nextToken();
             System.out.println(msg);
             for(Client_Handler User : NET_term_Server.user_list) {
                 User.dos.writeUTF(msg);
             }
-            return true;
         }
         else if(tempHeader.equals(TAG.INVITE.name())) {
             //이 경우엔 HEADER를 INVITE_REPLY로 설정하고 다시 Client에게 보낸 뒤 유저의 정보를 받아온다.
             System.out.println(msg);
-            //이 문장이 전달되지 않는다.
-            this.dos.writeUTF(TAG.INVITE_REPLY.name() + "##" + "초대하실 유저의 이름을 입력해주세요");
-            return true;
+            dos.writeUTF(TAG.INVITE_REPLY.name() + "##" + "초대하실 유저의 이름을 입력해주세요");
         }
         else if(tempHeader.equals(TAG.SHOW_INFO.name())) {
-            return false;
         }
         else if(tempHeader.equals(TAG.INVITE_REPLY.name())) {
-
+            System.out.println(msg);
+            store = st.nextToken();
+            for(Client_Handler User : NET_term_Server.user_list) {
+                if(User.userID.equals(store)) {
+                    User.dos.writeUTF(TAG.INVITE_REQUEST.name()+"##"+this.userID+" want to invite you");
+                    // 초청을 수락할 경우 초대를 보낸 유저와 초대를 받은 유저 둘의 정보가 필요하므로 초대를 보낸 유저의 정보를 저장.
+                    store = this.userID;
+                    break;
+                }
+            }
         }
-        return false;
+        else if(tempHeader.equals(TAG.INVITE_PD.name())) {
+            if(st.nextToken().equals("1")) {
+                System.out.println("hi");
+                for(Client_Handler User : NET_term_Server.user_list) {
+                    if(User.userID.equals(store)) {
+                        User.dos.writeUTF(TAG.INVITE_PERMIT.name() + "##" + "초대 수락, 게임방으로 이동합니다.");
+                        this.dos.writeUTF(TAG.INVITE_PERMIT.name() + "##" + "초대 수락, 게임방으로 이동합니다.");
+                        User.CanPlay = false;
+                        this.CanPlay = false;
+                        break;
+                    }
+                }
+            }
+            else {
+                for(Client_Handler User : NET_term_Server.user_list) {
+                    if (User.userID.equals(store)) {
+                        User.dos.writeUTF(TAG.INVITE_DENY.name() + "##" + this.userID + " 님이 초대를 거절하셨습니다.");
+                        break;
+                    }
+                }
+            }
+        }
     }
 }
