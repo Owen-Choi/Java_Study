@@ -33,7 +33,6 @@ class Client_Handler implements Runnable {
     BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     String userID;
     boolean CanPlay;
-    StringBuilder sb = new StringBuilder();
     StringTokenizer st;
     //유저 정보 필요한거 더 추가하기. 고유번호
     //로그인 후 서버가 만들어 줄 클라이언트의 정보에 대한 생성자.
@@ -94,18 +93,17 @@ class Client_Handler implements Runnable {
             store = st.nextToken();
             for(Client_Handler User : NET_term_Server.user_list) {
                 if(User.userID.equals(store)) {
-                    User.dos.writeUTF(TAG.INVITE_REQUEST.name()+"##"+this.userID+" want to invite you");
+                    User.dos.writeUTF(TAG.INVITE_REQUEST.name()+"##"+this.userID+"##"+"want to invite you");
                     // 초청을 수락할 경우 초대를 보낸 유저와 초대를 받은 유저 둘의 정보가 필요하므로 초대를 보낸 유저의 정보를 저장.
-                    store = this.userID;
                     break;
                 }
             }
         }
         else if(tempHeader.equals(TAG.INVITE_PD.name())) {
+            String inviter = st.nextToken();
             if(st.nextToken().equals("1")) {
-                System.out.println("hi");
                 for(Client_Handler User : NET_term_Server.user_list) {
-                    if(User.userID.equals(store)) {
+                    if(User.userID.equals(inviter)) {
                         User.dos.writeUTF(TAG.INVITE_PERMIT.name() + "##" + "초대 수락, 게임방으로 이동합니다.");
                         this.dos.writeUTF(TAG.INVITE_PERMIT.name() + "##" + "초대 수락, 게임방으로 이동합니다.");
                         User.CanPlay = false;
@@ -116,7 +114,7 @@ class Client_Handler implements Runnable {
             }
             else {
                 for(Client_Handler User : NET_term_Server.user_list) {
-                    if (User.userID.equals(store)) {
+                    if (User.userID.equals(inviter)) {
                         User.dos.writeUTF(TAG.INVITE_DENY.name() + "##" + this.userID + " 님이 초대를 거절하셨습니다.");
                         break;
                     }

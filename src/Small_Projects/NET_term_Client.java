@@ -42,11 +42,19 @@ class Writer implements Runnable {
     @Override
     public void run() {
         try {
-            while(!ChangeMode());
+            //ChangeMode에서 나오지 않으면 초대에 응할 수 없다.
+            //이에 대한 조치는 플레이어가 원할때만 모드를 바꿀 수 있게 한다.
+            HeadTag = TAG.CHAT.name();
+            System.out.println("If you want to Change mode, please enter \"ChangeMode\" ");
             while(true) {
                 String msgToSend = br.readLine();
-                dos.writeUTF(HeadTag + "##" + msgToSend);
-                System.out.println(HeadTag + "##" + msgToSend);
+                if(msgToSend.equals("ChangeMode")) {
+                    ChangeMode();
+                }
+                else {
+                    dos.writeUTF(HeadTag + "##" + msgToSend);
+                    //System.out.println(HeadTag + "##" + msgToSend);
+                }
             }
         }catch(IOException e) {
             e.printStackTrace();
@@ -58,22 +66,26 @@ class Writer implements Runnable {
         System.out.println("1. chatting \n" +
                 "2. invite \n" +
                 "3. show information ");
-        int tempnumber = Integer.parseInt(br.readLine());
-        switch (tempnumber) {
-            case 1 :
-                HeadTag = TAG.CHAT.name();
-                break;
-            case 2 :
-                HeadTag = TAG.INVITE.name();
-                dos.writeUTF(TAG.INVITE.name() + "##"+"inviting user");
-                //HeadTag = TAG.INVITE_REPLY.name();
-                break;
-            case 3 :
-                HeadTag = TAG.SHOW_INFO.name();
-                break;
-            default:
-                System.out.println("invalid value. try again");
-                return false;
+        int tempnumber;
+        HeadTag = null;
+        while(HeadTag == null) {
+            tempnumber = Integer.parseInt(br.readLine());
+            switch (tempnumber) {
+                case 1:
+                    HeadTag = TAG.CHAT.name();
+                    break;
+                case 2:
+                    HeadTag = TAG.INVITE.name();
+                    dos.writeUTF(TAG.INVITE.name() + "##" + "inviting user");
+                    //HeadTag = TAG.INVITE_REPLY.name();
+                    break;
+                case 3:
+                    HeadTag = TAG.SHOW_INFO.name();
+                    break;
+                default:
+                    System.out.println("invalid value. try again");
+                    return false;
+            }
         }
         return true;
     }
@@ -113,15 +125,14 @@ class Reader implements Runnable {
         if(Header.equals(TAG.INVITE_REPLY.name())) {
             // 헤더가 INVITE_REPLY라는 것은 사용자가 초대할 다른 사용자의 정보를 넘겨주어야 한다는 뜻이다.
             System.out.println(st.nextToken());
-            // Header의 정보가 INVITE_REPLY가 아닌 INVITE로 들어간다.
             writer.HeadTag_Setter(TAG.INVITE_REPLY.name());
         }
         else if(Header.equals(TAG.INVITE_REQUEST.name())) {
-            System.out.println(st.nextToken());
+            String inviter = st.nextToken();
+            System.out.println(inviter + " " + st.nextToken());
             System.out.println("초대에 응하실려면 1, 거절하실려면 2를 입력해주세요.");
             //INVITE_PD 뒤에 1이 붙으면 수락, 2가 붙으면 거절의 의미이다.
-            //HeadTag가 INVITE_PD로 바뀌지 않는다. 원인이 뭐지?
-            writer.HeadTag_Setter(TAG.INVITE_PD.name());
+            writer.HeadTag_Setter(TAG.INVITE_PD.name()+"##"+inviter+"##");
         }
         else if(Header.equals(TAG.INVITE_PERMIT.name())) {
             System.out.println(st.nextToken());
